@@ -1,0 +1,231 @@
+.dashB {
+  position: relative;
+    width: 1200px;
+    margin-left: 300px;
+    padding: 20px;
+    min-height: 750px;
+}
+
+.line1 {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btnAdd {
+    background-color: blue;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.lineFilter {
+    margin-top: 20px;
+    display: flex;
+}
+
+input[type=text], select {
+    padding: 12px 20px;
+    margin: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  input[type=submit] {
+    background-color: blue;
+    color: white;
+    padding: 10px 16px;
+    margin: 8px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  input[type=submit]:hover {
+    background-color: rgb(106, 106, 228);
+  }
+
+.btnAdd:hover {
+    background-color: rgb(111, 111, 230);
+}
+
+table, td, th {  
+    border: 1px solid #ddd;
+    text-align: center;
+    font-size: 1rem;
+  }
+  
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    padding: 10px;
+  }
+
+.activeAcc {
+    padding: 7px;
+    border: 1px solid white;
+    background-color: rgb(216, 239, 216);
+    color: green;
+    border-radius: 5px;
+}
+
+.btnAction {
+    border-radius: 100px;
+    padding: 10px;
+    margin: 5px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: white;
+}
+
+.btnAction:hover {
+    opacity: 0.7;
+}
+
+.btnEdit {
+    background-color: blue;
+}
+
+.btnDelete {
+    background-color: red;
+}
+
+.screenAdd {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color:rgba(0, 0, 0, 0.2) ;
+}
+
+.formAdd {
+  padding: 20px;
+  position: absolute;
+  width: 530px;
+  min-height: 500px;
+  top: 16%;
+  right: 35%;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.label {
+  margin-top: 20px;
+  display: block;
+}
+
+.formLine1 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btnX {
+  font-size: 1.2rem;
+  background-color: transparent;
+  padding: 0 20px;
+  border-radius: 5px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: rgb(98, 98, 98);
+
+}
+
+.btnX:hover {
+  background-color: rgb(218, 218, 218);
+}
+
+.btnSearch {
+  padding: 10px;
+  display: block;
+  margin-left: 10px;
+  background-color: blue;
+  color: white;
+  border-radius: 5px;
+  border: none;
+}
+
+.btnSearch:hover {
+  opacity: 0.6;
+  cursor: pointer;
+}
+
+.inp {
+  display: block;
+  width: 400px;
+}
+
+.select {
+  display: block;
+}
+
+.listBtn {
+  display: flex;
+  justify-content: space-between;
+  margin-left: 330px;
+  margin-top: 60px;
+  width: 30%;
+
+}
+
+.btnForm {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+}
+
+
+.cancel {
+  background-color: white;
+  border: 0.5px solid rgb(204, 204, 204);
+}
+
+.cancel:hover {
+  background-color: #ccc;
+}
+
+.btnSubmit {
+  background-color: blue;
+  color: white;
+}
+
+.btnSubmit:hover {
+  opacity: 0.6;
+}
+
+.pagination {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.pagination .page-num {
+  padding: 3px 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-weight: 400;
+}
+
+.pagination .page-num:hover {
+  background-color: rgb(208, 164, 230);
+  color: white;
+}
+
+.pagination .active {
+  background-color: rgb(148, 23, 210);
+  color: white;
+  border-radius: 3px;
+}

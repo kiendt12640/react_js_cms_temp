@@ -1,20 +1,3 @@
-/**
-=========================================================
-* Argon Dashboard 2 MUI - v3.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-material-ui
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
-import { useState } from "react";
-
 // react-router-dom components
 import { Link } from "react-router-dom";
 
@@ -23,6 +6,8 @@ import Switch from "@mui/material/Switch";
 
 // Argon Dashboard 2 MUI components
 import ArgonBox from "components/ArgonBox";
+import CoverLayout from "layouts/authentication/components/CoverLayout";
+
 import ArgonTypography from "components/ArgonTypography";
 import ArgonInput from "components/ArgonInput";
 import ArgonButton from "components/ArgonButton";
@@ -30,65 +15,97 @@ import ArgonButton from "components/ArgonButton";
 // Authentication layout components
 import IllustrationLayout from "layouts/authentication/components/IllustrationLayout";
 
-// Image
-const bgImage =
-  "https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg";
+import "./index.css";
+import { useState, useEffect } from "react";
+import api from "./api";
+import { useNavigate } from "react-router-dom";
 
 function Illustration() {
-  const [rememberMe, setRememberMe] = useState(false);
+  // const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSetRememberMe = () => setRememberMe(!rememberMe);
+  // const handleSetRememberMe = () => setRememberMe(!rememberMe);
+
+  const navigate = useNavigate();
+
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassWord] = useState("");
+
+  const [listAcc, setlistAcc] = useState([]);
+
+  const [load, setLoad] = useState(true);
+
+  const resetForm = () => {
+    setPhoneNumber("");
+    setPassWord("");
+  };
+
+  const handleModifyAccount = async (e) => {
+    e.preventDefault();
+    const loginAcc = {
+      phoneNumber: phoneNumber,
+      password: password,
+    };
+    let check = 0;
+
+    if (check == 0) {
+      try {
+        await api.post("/sign-up", loginAcc);
+        setLoad(!load);
+        resetForm();
+        navigate("/dashboard");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const getListAccount = async () => {
+      const nv = await callAPI("/sign-in");
+      setlistAcc(nv);
+    };
+
+    getListAccount();
+  }, [load]);
+
+  const callAPI = async (route) => {
+    try {
+      const res = await api.get(route);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  };
 
   return (
-    <IllustrationLayout
-      title="Sign In"
-      description="Enter your email and password to sign in"
-      illustration={{
-        image: bgImage,
-        title: '"Attention is the new currency"',
-        description:
-          "The more effortless the writing looks, the more effort the writer actually put into the process.",
-      }}
-    >
-      <ArgonBox component="form" role="form">
+    <CoverLayout>
+      <form className="formSignup" onSubmit={handleModifyAccount}>
         <ArgonBox mb={2}>
-          <ArgonInput type="email" placeholder="Email" size="large" />
+          <input
+            className="inpPhoneNumber"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            type="text"
+            placeholder="PhoneNumber"
+          />
         </ArgonBox>
         <ArgonBox mb={2}>
-          <ArgonInput type="password" placeholder="Password" size="large" />
-        </ArgonBox>
-        <ArgonBox display="flex" alignItems="center">
-          <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-          <ArgonTypography
-            variant="button"
-            fontWeight="regular"
-            onClick={handleSetRememberMe}
-            sx={{ cursor: "pointer", userSelect: "none" }}
-          >
-            &nbsp;&nbsp;Remember me
-          </ArgonTypography>
+          <input
+            className="inpPassword"
+            value={password}
+            onChange={(e) => setPassWord(e.target.value)}
+            type="password"
+            placeholder="Password"
+          />
         </ArgonBox>
         <ArgonBox mt={4} mb={1}>
-          <ArgonButton color="info" size="large" fullWidth>
+          <button className="btnSignup" type="submit">
             Sign In
-          </ArgonButton>
+          </button>
         </ArgonBox>
-        <ArgonBox mt={3} textAlign="center">
-          <ArgonTypography variant="button" color="text" fontWeight="regular">
-            Don&apos;t have an account?{" "}
-            <ArgonTypography
-              component={Link}
-              to="/authentication/sign-up"
-              variant="button"
-              color="info"
-              fontWeight="medium"
-            >
-              Sign up
-            </ArgonTypography>
-          </ArgonTypography>
-        </ArgonBox>
-      </ArgonBox>
-    </IllustrationLayout>
+      </form>
+    </CoverLayout>
   );
 }
 

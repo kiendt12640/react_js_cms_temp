@@ -1,18 +1,3 @@
-/**
-=========================================================
-* Argon Dashboard 2 MUI - v3.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-material-ui
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 // react-router-dom components
 import { Link } from "react-router-dom";
 
@@ -31,84 +16,153 @@ import CoverLayout from "layouts/authentication/components/CoverLayout";
 import Socials from "layouts/authentication/components/Socials";
 import Separator from "layouts/authentication/components/Separator";
 
-// Images
-const bgImage =
-  "https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signup-cover.jpg";
+import "./index.css";
+import api from "./api";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Cover() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassWord] = useState("");
+  const [passwordConfirm, setPassWordConfirm] = useState("");
+
+  const [listAcc, setlistAcc] = useState([]);
+  const [listTrangThai, setListTrangThai] = useState([]);
+
+  const [load, setLoad] = useState(true);
+
+  const resetForm = () => {
+    setName("");
+    setPhoneNumber("");
+    setPassWord("");
+    setPassWordConfirm("");
+  };
+
+  const handleModifyAccount = async (e) => {
+    e.preventDefault();
+    const newAcc = {
+      name: name,
+      phoneNumber: phoneNumber,
+      password: password,
+      trangthaiID: listTrangThai[0].id,
+    };
+    let check = 0;
+    listAcc.forEach((item) => {
+      if (item.phoneNumber === newAcc.phoneNumber) {
+        window.alert("Số điện thoại đã tồn tại!");
+        check++;
+      } else {
+        setLoad(!load);
+      }
+    });
+    if (!name || !phoneNumber || !password || !passwordConfirm) {
+      window.alert("Hãy nhập đủ thông tin!");
+      check++;
+    } else if (password !== passwordConfirm) {
+      window.alert("Mật khẩu nhập lại không đúng!");
+      setPassWordConfirm("");
+      check++;
+    }
+    if (check === 0) {
+      try {
+        await api.post("/sign-up", newAcc);
+        window.alert("Tạo tài khoản thành công!");
+        setLoad(!load);
+        resetForm();
+        navigate("/sign-in");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const getTrangThai = async () => {
+      const trangthai = await callAPI("/trangthai");
+      setListTrangThai(trangthai);
+    };
+
+    const getListAccount = async () => {
+      const nv = await callAPI("/sign-up");
+      setlistAcc(nv);
+    };
+
+    getTrangThai();
+    getListAccount();
+  }, [load]);
+
+  const callAPI = async (route) => {
+    try {
+      const res = await api.get(route);
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      return [];
+    }
+  };
+
   return (
-    <CoverLayout
-      title="Welcome!"
-      description="Use these awesome forms to login or create new account in your project for free."
-      image={bgImage}
-      imgPosition="top"
-      button={{ color: "dark", variant: "gradient" }}
-    >
-      <Card>
-        <ArgonBox p={3} mb={1} textAlign="center">
-          <ArgonTypography variant="h5" fontWeight="medium">
-            Register with
-          </ArgonTypography>
+    <CoverLayout>
+      <form className="formSignup" onSubmit={handleModifyAccount}>
+        <ArgonBox mb={2}>
+          <input
+            className="inpPhoneNumber"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            type="text"
+            placeholder="Name"
+          />
         </ArgonBox>
         <ArgonBox mb={2}>
-          <Socials />
+          <input
+            className="inpPhoneNumber"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            type="text"
+            placeholder="PhoneNumber"
+          />
         </ArgonBox>
-        <ArgonBox px={12}>
-          <Separator />
+        <ArgonBox mb={2}>
+          <input
+            className="inpPassword"
+            value={password}
+            onChange={(e) => setPassWord(e.target.value)}
+            type="password"
+            placeholder="Password"
+          />
         </ArgonBox>
-        <ArgonBox pt={2} pb={3} px={3}>
-          <ArgonBox component="form" role="form">
-            <ArgonBox mb={2}>
-              <ArgonInput placeholder="Name" />
-            </ArgonBox>
-            <ArgonBox mb={2}>
-              <ArgonInput type="email" placeholder="Email" />
-            </ArgonBox>
-            <ArgonBox mb={2}>
-              <ArgonInput type="password" placeholder="Password" />
-            </ArgonBox>
-            <ArgonBox display="flex" alignItems="center">
-              <Checkbox defaultChecked />
-              <ArgonTypography
-                variant="button"
-                fontWeight="regular"
-                sx={{ cursor: "pointer", userSelect: "none" }}
-              >
-                &nbsp;&nbsp;I agree the&nbsp;
-              </ArgonTypography>
-              <ArgonTypography
-                component="a"
-                href="#"
-                variant="button"
-                fontWeight="bold"
-                textGradient
-              >
-                Terms and Conditions
-              </ArgonTypography>
-            </ArgonBox>
-            <ArgonBox mt={4} mb={1}>
-              <ArgonButton variant="gradient" color="dark" fullWidth>
-                sign up
-              </ArgonButton>
-            </ArgonBox>
-            <ArgonBox mt={2}>
-              <ArgonTypography variant="button" color="text" fontWeight="regular">
-                Already have an account?&nbsp;
-                <ArgonTypography
-                  component={Link}
-                  to="/authentication/sign-in"
-                  variant="button"
-                  color="dark"
-                  fontWeight="bold"
-                  textGradient
-                >
-                  Sign in
-                </ArgonTypography>
-              </ArgonTypography>
-            </ArgonBox>
-          </ArgonBox>
+        <ArgonBox mb={2}>
+          <input
+            className="inpPassword"
+            value={passwordConfirm}
+            onChange={(e) => setPassWordConfirm(e.target.value)}
+            type="password"
+            placeholder="Confirm Password"
+          />
         </ArgonBox>
-      </Card>
+        <ArgonBox mt={4} mb={1}>
+          <button className="btnSignup" type="submit">
+            Sign Up
+          </button>
+        </ArgonBox>
+        <ArgonBox mt={2}>
+          <ArgonTypography variant="button" color="text" fontWeight="regular">
+            Already have an account?&nbsp;
+            <ArgonTypography
+              component={Link}
+              to="/sign-in"
+              variant="button"
+              color="dark"
+              fontWeight="bold"
+              textGradient
+            >
+              Sign in
+            </ArgonTypography>
+          </ArgonTypography>
+        </ArgonBox>
+      </form>
     </CoverLayout>
   );
 }
