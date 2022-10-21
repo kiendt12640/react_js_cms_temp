@@ -1,38 +1,13 @@
-// @mui material components
-import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
-
-// Argon Dashboard 2 MUI components
-import ArgonBox from "components/ArgonBox";
-import ArgonTypography from "components/ArgonTypography";
-
-// Argon Dashboard 2 MUI example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import DetailedStatisticsCard from "examples/Cards/StatisticsCards/DetailedStatisticsCard";
-import SalesTable from "examples/Tables/SalesTable";
-import CategoriesList from "examples/Lists/CategoriesList";
-import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
-
-// Argon Dashboard 2 MUI base styles
-import typography from "assets/theme/base/typography";
-
-// Dashboard layout components
-import Slider from "layouts/dashboard/components/Slider";
-
-// Data
-import gradientLineChartData from "layouts/dashboard/data/gradientLineChartData";
-import salesTableData from "layouts/dashboard/data/salesTableData";
-import categoriesListData from "layouts/dashboard/data/categoriesListData";
-
 import "./index.css";
-import api from "./api";
+import api from "../../middleware/api";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
 import moment from "moment/moment";
+import { useNavigate } from "react-router-dom";
 
 function Bill() {
+  const navigate = useNavigate();
+
   const [trangThaiDon, settrangThaiDon] = useState("");
   const [khachHang, setkhachHang] = useState("");
   const [ngayThanhToan, setngayThanhToan] = useState("");
@@ -155,30 +130,34 @@ function Bill() {
 
   //Render
   useEffect(() => {
-    const getTrangThaiDon = async () => {
-      const trangthai = await callAPI("/trangthaidon");
-      setListTrangThai(trangthai);
-    };
+    if (localStorage.getItem("token") === null) {
+      navigate("/sign-in");
+    } else {
+      const getTrangThaiDon = async () => {
+        const trangthai = await callAPI("/trangthaidon");
+        setListTrangThai(trangthai);
+      };
 
-    const getkhachhang = async () => {
-      const kh = await callAPI("/customer");
-      setlistKhachHang(kh);
-    };
+      const getkhachhang = async () => {
+        const kh = await callAPI("/customer");
+        setlistKhachHang(kh);
+      };
 
-    const getBill = async () => {
-      const bill = await callAPI("/bill");
-      setlistBill(bill);
-    };
+      const getBill = async () => {
+        await callAPI2("/bill");
+        // setlistBill(bill);
+      };
 
-    const getDichVu = async () => {
-      const dichVu = await callAPI("/service");
-      setListDichVu(dichVu);
-    };
+      const getDichVu = async () => {
+        const dichVu = await callAPI("/service");
+        setListDichVu(dichVu);
+      };
 
-    getDichVu();
-    getTrangThaiDon();
-    getkhachhang();
-    getBill();
+      getDichVu();
+      getTrangThaiDon();
+      getkhachhang();
+      getBill();
+    }
   }, [load]);
 
   const callAPI = async (route) => {
@@ -191,6 +170,28 @@ function Bill() {
     }
   };
 
+  const callAPI2 = async (route) => {
+    try {
+      await api
+        .get(route)
+        .then((res) => {
+          if (res.data.error_code === 498) {
+            setListTrangThai([]);
+            setlistKhachHang([]);
+            setListDichVu([]);
+            setlistBill([]);
+          } else {
+            setlistBill(res.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // Filter
   const handleRefetch = async (e) => {
     e.preventDefault();
@@ -199,8 +200,6 @@ function Bill() {
         params: {
           trangthaidonID: filtertrangThaiDon,
           khachhangID: filterKhachHang,
-          // ngaythanhtoan: filterngayThanhToan,
-          // ngaynhanhang: filterngayNhanHang,
         },
       });
       setlistBill(res.data);
@@ -228,466 +227,509 @@ function Bill() {
   };
 
   const deleteBillDetail = (item) => {
-    const newListBillDetail = listBillDetail.filter(function (
-      value,
-      index,
-      arr
-    ) {
+    const newListBillDetail = listBillDetail.filter(function (value) {
       return value != item;
     });
     setlistBillDetail(newListBillDetail);
   };
-
-  return (
-    <div className="dashB">
-      {formAdd ? (
-        <div>
-          <div
-            className="screenAdd"
-            onClick={() => {
-              resetForm();
-              setFormAdd(false);
-            }}
-          >
-            <form
-              className="formAddBill"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onSubmit={handleModifyBill}
-            >
-              <div className="formLine1">
-                {updateId ? <h2>Sửa hóa đơn</h2> : <h2>Thêm hóa đơn</h2>}
-                <button
-                  className="btnX"
-                  onClick={() => {
-                    resetForm();
-                    setFormAdd(false);
+  {
+    if (localStorage.getItem("token") === null) {
+      navigate("/sign-in");
+    } else {
+      return (
+        <div className="dashB">
+          {formAdd ? (
+            <div>
+              <div
+                className="screenAdd"
+                onClick={() => {
+                  resetForm();
+                  setFormAdd(false);
+                }}
+              >
+                <form
+                  className="formAddBill"
+                  onClick={(e) => {
+                    e.stopPropagation();
                   }}
+                  onSubmit={handleModifyBill}
                 >
-                  x
-                </button>
-              </div>
-              <div className="listElementForm">
-                <div>
-                  {updateId ? (
+                  <div className="formLine1">
+                    {updateId ? <h2>Sửa hóa đơn</h2> : <h2>Thêm hóa đơn</h2>}
+                    <button
+                      className="btnX"
+                      onClick={() => {
+                        resetForm();
+                        setFormAdd(false);
+                      }}
+                    >
+                      x
+                    </button>
+                  </div>
+                  <div className="listElementForm">
                     <div>
-                      <label className="label">Trạng thái đơn</label>
+                      {updateId ? (
+                        <div>
+                          <label className="label">Trạng thái đơn</label>
+                          <select
+                            value={trangThaiDon}
+                            style={{
+                              color: trangThaiDon ? "black" : "#cecece",
+                            }}
+                            onChange={(e) => settrangThaiDon(e.target.value)}
+                            className="select"
+                          >
+                            <option value="" style={{ color: "#cecece" }}>
+                              Chưa có trạng thái
+                            </option>
+                            {listTrangThai.map((item) => {
+                              return (
+                                <option
+                                  style={{ color: "black" }}
+                                  value={item.id}
+                                >
+                                  {item.trangthai}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      ) : (
+                        <div></div>
+                      )}
+
+                      <label className="label">Khách hàng</label>
                       <select
-                        value={trangThaiDon}
-                        style={{ color: trangThaiDon ? "black" : "#cecece" }}
-                        onChange={(e) => settrangThaiDon(e.target.value)}
+                        value={khachHang}
+                        onChange={(e) => setkhachHang(e.target.value)}
                         className="select"
                       >
-                        <option value="" style={{ color: "#cecece" }}>
-                          Chưa có trạng thái
-                        </option>
-                        {listTrangThai.map((item) => {
-                          return (
-                            <option style={{ color: "black" }} value={item.id}>
-                              {item.trangthai}
-                            </option>
-                          );
+                        <option></option>
+                        {listKhachHang.map((item) => {
+                          return <option value={item.id}>{item.name}</option>;
                         })}
                       </select>
-                    </div>
-                  ) : (
-                    <div></div>
-                  )}
+                      {updateId && (
+                        <div>
+                          <label className="label">Ngày thanh toán</label>
+                          <input
+                            defaultValue={new Date(
+                              ngayThanhToan
+                            ).toLocaleDateString("en-CA")}
+                            onChange={(e) => setngayThanhToan(e.target.value)}
+                            className="inp"
+                            placeholder="Ngày thanh toán"
+                            type="date"
+                          ></input>
+                        </div>
+                      )}
 
-                  <label className="label">Khách hàng</label>
-                  <select
-                    value={khachHang}
-                    onChange={(e) => setkhachHang(e.target.value)}
-                    className="select"
-                  >
-                    <option></option>
-                    {listKhachHang.map((item) => {
-                      return <option value={item.id}>{item.name}</option>;
-                    })}
-                  </select>
-                  {updateId && (
-                    <div>
-                      <label className="label">Ngày thanh toán</label>
+                      <label className="label">Ngày nhận hàng</label>
                       <input
-                        defaultValue={new Date(
-                          ngayThanhToan
-                        ).toLocaleDateString("en-CA")}
-                        onChange={(e) => setngayThanhToan(e.target.value)}
+                        defaultValue={new Date(ngayNhanHang).toLocaleDateString(
+                          "en-CA"
+                        )}
+                        onChange={(e) => setngayNhanHang(e.target.value)}
                         className="inp"
-                        placeholder="Ngày thanh toán"
+                        placeholder="Ngày nhận hàng"
+                        type="date"
+                      ></input>
+                      <label className="label">Ngày trả hàng</label>
+                      <input
+                        defaultValue={new Date(ngayTraHang).toLocaleDateString(
+                          "en-CA"
+                        )}
+                        onChange={(e) => setngayTraHang(e.target.value)}
+                        className="inp"
+                        placeholder="Ngày nhận hàng"
                         type="date"
                       ></input>
                     </div>
-                  )}
+                    <div>
+                      {updateId ? (
+                        <div></div>
+                      ) : (
+                        <form className="formAddBillDetail">
+                          <select
+                            value={dichVu}
+                            onChange={(e) => {
+                              setDichVu(e.target.value);
+                            }}
+                            className="select"
+                            name="service"
+                          >
+                            <option></option>
+                            {listDichVu.map((item) => {
+                              return (
+                                <option value={item.id}>
+                                  {item.tendichvu}
+                                </option>
+                              );
+                            })}
+                          </select>
+                          <input
+                            value={soluong}
+                            onChange={(e) => {
+                              setSoLuong(e.target.value);
+                            }}
+                            type="text"
+                            placeholder="Số lượng"
+                            className="inputSoLuong"
+                          ></input>
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setlistBillDetail([
+                                ...listBillDetail,
+                                { dichvuID: dichVu, soluong: soluong },
+                              ]);
+                              setSoLuong("");
+                              setDichVu("");
+                            }}
+                            className="btnAddBillDetail"
+                          >
+                            Thêm
+                          </button>
+                        </form>
+                      )}
 
-                  <label className="label">Ngày nhận hàng</label>
-                  <input
-                    defaultValue={new Date(ngayNhanHang).toLocaleDateString(
-                      "en-CA"
-                    )}
-                    onChange={(e) => setngayNhanHang(e.target.value)}
-                    className="inp"
-                    placeholder="Ngày nhận hàng"
-                    type="date"
-                  ></input>
-                  <label className="label">Ngày trả hàng</label>
-                  <input
-                    defaultValue={new Date(ngayTraHang).toLocaleDateString(
-                      "en-CA"
-                    )}
-                    onChange={(e) => setngayTraHang(e.target.value)}
-                    className="inp"
-                    placeholder="Ngày nhận hàng"
-                    type="date"
-                  ></input>
-                </div>
-                <div>
-                  {updateId ? (
-                    <div></div>
-                  ) : (
-                    <form className="formAddBillDetail">
-                      <select
-                        value={dichVu}
-                        onChange={(e) => {
-                          setDichVu(e.target.value);
-                        }}
-                        className="select"
-                        name="service"
-                      >
-                        <option></option>
-                        {listDichVu.map((item) => {
+                      <table>
+                        <tr>
+                          <th>Tên dịch vụ</th>
+                          <th>Số lượng</th>
+                          <th>Thành tiền</th>
+                        </tr>
+                        {currentItemsform.map((item, index) => {
                           return (
-                            <option value={item.id}>{item.tendichvu}</option>
+                            <tr>
+                              <td>
+                                {listDichVu?.find(
+                                  ({ id }) => id == item.dichvuID
+                                ) &&
+                                  listDichVu?.find(
+                                    ({ id }) => id == item.dichvuID
+                                  ).tendichvu}
+                              </td>
+                              <td>{item.soluong}</td>
+                              <td>
+                                {listDichVu?.find(
+                                  ({ id }) => id == item.dichvuID
+                                ) &&
+                                  listDichVu?.find(
+                                    ({ id }) => id == item.dichvuID
+                                  ).giadichvu * item.soluong}
+                              </td>
+                              {updateId ? (
+                                <div></div>
+                              ) : (
+                                <td>
+                                  <button
+                                    className="btnDeleteBillDetail"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      deleteBillDetail(item);
+                                    }}
+                                  >
+                                    Xóa
+                                  </button>
+                                </td>
+                              )}
+                            </tr>
                           );
                         })}
-                      </select>
-                      <input
-                        value={soluong}
-                        onChange={(e) => {
-                          setSoLuong(e.target.value);
-                        }}
-                        type="text"
-                        placeholder="Số lượng"
-                        className="inputSoLuong"
-                      ></input>
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setlistBillDetail([
-                            ...listBillDetail,
-                            { dichvuID: dichVu, soluong: soluong },
-                          ]);
-                          setSoLuong("");
-                          setDichVu("");
-                        }}
-                        className="btnAddBillDetail"
-                      >
-                        Thêm
-                      </button>
-                    </form>
-                  )}
-
-                  <table>
-                    <tr>
-                      <th>Tên dịch vụ</th>
-                      <th>Số lượng</th>
-                      <th>Thành tiền</th>
-                    </tr>
-                    {currentItemsform.map((item, index) => {
-                      return (
-                        <tr>
-                          <td>
-                            {listDichVu?.find(
-                              ({ id }) => id == item.dichvuID
-                            ) &&
-                              listDichVu?.find(({ id }) => id == item.dichvuID)
-                                .tendichvu}
-                          </td>
-                          <td>{item.soluong}</td>
-                          <td>
-                            {listDichVu?.find(
-                              ({ id }) => id == item.dichvuID
-                            ) &&
-                              listDichVu?.find(({ id }) => id == item.dichvuID)
-                                .giadichvu * item.soluong}
-                          </td>
-                          {updateId ? (
-                            <div></div>
-                          ) : (
-                            <td>
-                              <button
-                                className="btnDeleteBillDetail"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  deleteBillDetail(item);
-                                }}
-                              >
-                                Xóa
-                              </button>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </table>
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel="next >"
-                    onPageChange={handlePageClickform}
-                    pageRangeDisplayed={3}
-                    pageCount={pageCountform}
-                    previousLabel="< previous"
-                    renderOnZeroPageCount={null}
-                    containerClassName="pagination"
-                    pageLinkClassName="page-num"
-                    previousClassName="page-num"
-                    nextLinkClassName="page-num"
-                    activeClassName="active"
-                  />
-                </div>
+                      </table>
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel="next >"
+                        onPageChange={handlePageClickform}
+                        pageRangeDisplayed={3}
+                        pageCount={pageCountform}
+                        previousLabel="< previous"
+                        renderOnZeroPageCount={null}
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        previousClassName="page-num"
+                        nextLinkClassName="page-num"
+                        activeClassName="active"
+                      />
+                    </div>
+                  </div>
+                  <div className="listBtnBill">
+                    <button
+                      className="btnFormBill cancel"
+                      onClick={() => {
+                        setFormAdd(false);
+                        resetForm();
+                      }}
+                    >
+                      Hủy
+                    </button>
+                    <button type="submit" className="btnFormBill btnSubmit">
+                      Xác nhận
+                    </button>
+                  </div>
+                </form>
               </div>
-              <div className="listBtnBill">
+              <div className="line1">
+                <h3>Danh sách hóa đơn</h3>
+                <button className="btnAdd" onClick={() => setFormAdd(true)}>
+                  Tạo hóa đơn
+                </button>
+              </div>
+              <form className="lineFilter">
+                <select
+                  value={filtertrangThaiDon}
+                  onChange={(e) => setfiltertrangThaiDon(e.target.value)}
+                  className="select"
+                >
+                  <option></option>
+                  {listTrangThai.map((item) => {
+                    return <option value={item.id}>{item.trangthai}</option>;
+                  })}
+                </select>
+
+                <select
+                  value={filterKhachHang}
+                  onChange={(e) => setfilterKhachHang(e.target.value)}
+                  className="select"
+                >
+                  <option></option>
+                  {listKhachHang.map((item) => {
+                    return <option value={item.id}>{item.name}</option>;
+                  })}
+                </select>
+
                 <button
-                  className="btnFormBill cancel"
+                  type="submit"
+                  className="btnSearch"
+                  onClick={handleRefetch}
+                >
+                  Tìm
+                </button>
+              </form>
+              <table>
+                <tr>
+                  <th>STT</th>
+                  <th>Trạng thái</th>
+                  <th>Nhân viên</th>
+                  <th>Tổng tiền</th>
+                  <th>Ngày thanh toán</th>
+                  <th>Ngày nhận hàng </th>
+                  <th>Ngày trả hàng </th>
+                  <th>Hành động</th>
+                </tr>
+                {currentItems.map((item, index) => {
+                  return (
+                    <tr>
+                      <td>{index + 1}</td>
+                      <td>{item.trangthai}</td>
+                      <td>{item.khach_hang_name}</td>
+                      <td>{item.tongtien}</td>
+                      <td>
+                        {item.ngaythanhtoan &&
+                          moment(item.ngaythanhtoan).format("L")}
+                      </td>
+                      <td>
+                        {item.ngaynhanhang &&
+                          moment(item.ngaynhanhang).format("L")}
+                      </td>
+                      <td>
+                        {item.ngaytrahang &&
+                          moment(item.ngaytrahang).format("L")}
+                      </td>
+                      <td>
+                        <div className="action">
+                          <button
+                            className="btnAction btnEdit"
+                            onClick={() => {
+                              settrangThaiDon(item.trangthaidonID);
+                              setkhachHang(item.khachhangID);
+                              setngayThanhToan(item.ngaythanhtoan);
+                              setngayNhanHang(item.ngaynhanhang);
+                              setngayTraHang(item.ngaytrahang);
+                              setUpdateId(item.hoa_don_id);
+                              setlistBillDetail(item.hdct);
+                              setFormAdd(true);
+                            }}
+                          >
+                            Chi tiết
+                          </button>
+                          <button
+                            className="btnAction btnDelete"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteBill(item.hoa_don_id);
+                            }}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </table>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={3}
+                pageCount={pageCount}
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                containerClassName="pagination"
+                pageLinkClassName="page-num"
+                previousClassName="page-num"
+                nextLinkClassName="page-num"
+                activeClassName="active"
+              />
+            </div>
+          ) : (
+            <div>
+              <div className="line1">
+                <button
+                  className="btnLogout"
                   onClick={() => {
-                    setFormAdd(false);
-                    resetForm();
+                    localStorage.clear();
+                    navigate("/sign-in");
                   }}
                 >
-                  Hủy
+                  Đăng xuất
                 </button>
-                <button type="submit" className="btnFormBill btnSubmit">
-                  Xác nhận
+                <h3>Danh sách hóa đơn</h3>
+
+                <button className="btnAdd" onClick={() => setFormAdd(true)}>
+                  Tạo hóa đơn
                 </button>
               </div>
-            </form>
-          </div>
-          <div className="line1">
-            <h3>Danh sách hóa đơn</h3>
-            <button className="btnAdd" onClick={() => setFormAdd(true)}>
-              Tạo hóa đơn
-            </button>
-          </div>
-          <form className="lineFilter">
-            <select
-              value={filtertrangThaiDon}
-              onChange={(e) => setfiltertrangThaiDon(e.target.value)}
-              className="select"
-            >
-              <option></option>
-              {listTrangThai.map((item) => {
-                return <option value={item.id}>{item.trangthai}</option>;
-              })}
-            </select>
+              <form className="lineFilter">
+                <select
+                  value={filtertrangThaiDon}
+                  onChange={(e) => setfiltertrangThaiDon(e.target.value)}
+                  className="select"
+                >
+                  <option></option>
+                  {listTrangThai.map((item) => {
+                    return <option value={item.id}>{item.trangthai}</option>;
+                  })}
+                </select>
 
-            <select
-              value={filterKhachHang}
-              onChange={(e) => setfilterKhachHang(e.target.value)}
-              className="select"
-            >
-              <option></option>
-              {listKhachHang.map((item) => {
-                return <option value={item.id}>{item.name}</option>;
-              })}
-            </select>
-
-            <button type="submit" className="btnSearch" onClick={handleRefetch}>
-              Tìm
-            </button>
-          </form>
-          <table>
-            <tr>
-              <th>STT</th>
-              <th>Trạng thái</th>
-              <th>Nhân viên</th>
-              <th>Tổng tiền</th>
-              <th>Ngày thanh toán</th>
-              <th>Ngày nhận hàng </th>
-              <th>Ngày trả hàng </th>
-              <th>Hành động</th>
-            </tr>
-            {currentItems.map((item, index) => {
-              return (
+                <select
+                  value={filterKhachHang}
+                  onChange={(e) => setfilterKhachHang(e.target.value)}
+                  className="select"
+                >
+                  <option></option>
+                  {listKhachHang.map((item) => {
+                    return <option value={item.id}>{item.name}</option>;
+                  })}
+                </select>
+                {listBill.length > 0 ? (
+                  <button
+                    type="submit"
+                    className="btnSearch"
+                    onClick={handleRefetch}
+                  >
+                    Tìm
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="btnSearch"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert("Bạn chưa đăng nhập!");
+                    }}
+                  >
+                    Tìm
+                  </button>
+                )}
+              </form>
+              <table>
                 <tr>
-                  <td>{index + 1}</td>
-                  <td>{item.trangthai}</td>
-                  <td>{item.khach_hang_name}</td>
-                  <td>{item.tongtien}</td>
-                  <td>
-                    {item.ngaythanhtoan &&
-                      moment(item.ngaythanhtoan).format("L")}
-                  </td>
-                  <td>
-                    {item.ngaynhanhang && moment(item.ngaynhanhang).format("L")}
-                  </td>
-                  <td>
-                    {item.ngaytrahang && moment(item.ngaytrahang).format("L")}
-                  </td>
-                  <td>
-                    <div className="action">
-                      <button
-                        className="btnAction btnEdit"
-                        onClick={() => {
-                          settrangThaiDon(item.trangthaidonID);
-                          setkhachHang(item.khachhangID);
-                          setngayThanhToan(item.ngaythanhtoan);
-                          setngayNhanHang(item.ngaynhanhang);
-                          setngayTraHang(item.ngaytrahang);
-                          setUpdateId(item.hoa_don_id);
-                          setlistBillDetail(item.hdct);
-                          setFormAdd(true);
-                        }}
-                      >
-                        Chi tiết
-                      </button>
-                      <button
-                        className="btnAction btnDelete"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteBill(item.hoa_don_id);
-                        }}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
+                  <th>STT</th>
+                  <th>Trạng thái</th>
+                  <th>Khách hàng</th>
+                  <th>Tổng tiền</th>
+                  <th>Ngày thanh toán</th>
+                  <th>Ngày nhận hàng </th>
+                  <th>Ngày trả hàng </th>
+                  <th>Hành động</th>
                 </tr>
-              );
-            })}
-          </table>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            containerClassName="pagination"
-            pageLinkClassName="page-num"
-            previousClassName="page-num"
-            nextLinkClassName="page-num"
-            activeClassName="active"
-          />
+                {currentItems.map((item, index) => {
+                  if (item.xacNhanXoa == 0) {
+                    return (
+                      <tr>
+                        <td>{index + 1}</td>
+                        <td>{item.trangthai}</td>
+                        <td>{item.khach_hang_name}</td>
+                        <td>{item.tongtien}</td>
+                        <td>
+                          {item.ngaythanhtoan &&
+                            moment(item.ngaythanhtoan).format("L")}
+                        </td>
+                        <td>
+                          {item.ngaynhanhang &&
+                            moment(item.ngaynhanhang).format("L")}
+                        </td>
+                        <td>
+                          {item.ngaytrahang &&
+                            moment(item.ngaytrahang).format("L")}
+                        </td>
+
+                        <td>
+                          <div className="action">
+                            <button
+                              className="btnAction btnEdit"
+                              onClick={() => {
+                                settrangThaiDon(item.trangthaidonID);
+                                setkhachHang(item.khachhangID);
+                                setngayThanhToan(item.ngaythanhtoan);
+                                setngayNhanHang(item.ngaynhanhang);
+                                setngayTraHang(item.ngaytrahang);
+                                setlistBillDetail(item.hdct);
+                                setUpdateId(item.hoa_don_id);
+                                setFormAdd(true);
+                              }}
+                            >
+                              Chi tiết
+                            </button>
+                            <button
+                              className="btnAction btnDelete"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                deleteBill(item.hoa_don_id);
+                              }}
+                            >
+                              Xóa
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  }
+                })}
+              </table>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={3}
+                pageCount={pageCount}
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                containerClassName="pagination"
+                pageLinkClassName="page-num"
+                previousClassName="page-num"
+                nextLinkClassName="page-num"
+                activeClassName="active"
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <div>
-          <div className="line1">
-            <h3>Danh sách hóa đơn</h3>
-            <button className="btnAdd" onClick={() => setFormAdd(true)}>
-              Tạo hóa đơn
-            </button>
-          </div>
-          <form className="lineFilter">
-            <select
-              value={filtertrangThaiDon}
-              onChange={(e) => setfiltertrangThaiDon(e.target.value)}
-              className="select"
-            >
-              <option></option>
-              {listTrangThai.map((item) => {
-                return <option value={item.id}>{item.trangthai}</option>;
-              })}
-            </select>
-
-            <select
-              value={filterKhachHang}
-              onChange={(e) => setfilterKhachHang(e.target.value)}
-              className="select"
-            >
-              <option></option>
-              {listKhachHang.map((item) => {
-                return <option value={item.id}>{item.name}</option>;
-              })}
-            </select>
-
-            <button type="submit" className="btnSearch" onClick={handleRefetch}>
-              Tìm
-            </button>
-          </form>
-          <table>
-            <tr>
-              <th>STT</th>
-              <th>Trạng thái</th>
-              <th>Khách hàng</th>
-              <th>Tổng tiền</th>
-              <th>Ngày thanh toán</th>
-              <th>Ngày nhận hàng </th>
-              <th>Ngày trả hàng </th>
-              <th>Hành động</th>
-            </tr>
-            {currentItems.map((item, index) => {
-              if (item.xacNhanXoa == 0) {
-                return (
-                  <tr>
-                    <td>{index + 1}</td>
-                    <td>{item.trangthai}</td>
-                    <td>{item.khach_hang_name}</td>
-                    <td>{item.tongtien}</td>
-                    <td>
-                      {item.ngaythanhtoan &&
-                        moment(item.ngaythanhtoan).format("L")}
-                    </td>
-                    <td>
-                      {item.ngaynhanhang &&
-                        moment(item.ngaynhanhang).format("L")}
-                    </td>
-                    <td>
-                      {item.ngaytrahang && moment(item.ngaytrahang).format("L")}
-                    </td>
-
-                    <td>
-                      <div className="action">
-                        <button
-                          className="btnAction btnEdit"
-                          onClick={() => {
-                            settrangThaiDon(item.trangthaidonID);
-                            setkhachHang(item.khachhangID);
-                            setngayThanhToan(item.ngaythanhtoan);
-                            setngayNhanHang(item.ngaynhanhang);
-                            setngayTraHang(item.ngaytrahang);
-                            setlistBillDetail(item.hdct);
-                            setUpdateId(item.hoa_don_id);
-                            setFormAdd(true);
-                          }}
-                        >
-                          Chi tiết
-                        </button>
-                        <button
-                          className="btnAction btnDelete"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            deleteBill(item.hoa_don_id);
-                          }}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              }
-            })}
-          </table>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            containerClassName="pagination"
-            pageLinkClassName="page-num"
-            previousClassName="page-num"
-            nextLinkClassName="page-num"
-            activeClassName="active"
-          />
-        </div>
-      )}
-    </div>
-  );
+      );
+    }
+  }
 }
 
 export default Bill;

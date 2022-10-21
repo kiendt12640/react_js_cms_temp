@@ -6,10 +6,12 @@
     min-height: 750px;
 }
 
-.line1 {
-    display: flex;
-    justify-content: space-between;
+.line1Service {
     margin-top: 20px;
+}
+
+.line1Service h3 {
+  margin-top: 20px;
 }
 
 .btnAdd {

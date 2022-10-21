@@ -1,38 +1,13 @@
-// @mui material components
-import Grid from "@mui/material/Grid";
-import Icon from "@mui/material/Icon";
-
-// Argon Dashboard 2 MUI components
-import ArgonBox from "components/ArgonBox";
-import ArgonTypography from "components/ArgonTypography";
-
-// Argon Dashboard 2 MUI example components
-import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
-import DashboardNavbar from "examples/Navbars/DashboardNavbar";
-import Footer from "examples/Footer";
-import DetailedStatisticsCard from "examples/Cards/StatisticsCards/DetailedStatisticsCard";
-import SalesTable from "examples/Tables/SalesTable";
-import CategoriesList from "examples/Lists/CategoriesList";
-import GradientLineChart from "examples/Charts/LineCharts/GradientLineChart";
-
-// Argon Dashboard 2 MUI base styles
-import typography from "assets/theme/base/typography";
-
-// Dashboard layout components
-import Slider from "layouts/dashboard/components/Slider";
-
-// Data
-import gradientLineChartData from "layouts/dashboard/data/gradientLineChartData";
-import salesTableData from "layouts/dashboard/data/salesTableData";
-import categoriesListData from "layouts/dashboard/data/categoriesListData";
-
 import "./index.css";
-import api from "./api";
+import api from "../../middleware/api";
 import { useState, useEffect } from "react";
 import ReactPaginate from "react-paginate";
+import { useNavigate } from "react-router-dom";
 
 function Customer() {
   // const { size } = typography;
+  const navigate = useNavigate();
+
   const [accName, setAccName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
@@ -112,17 +87,16 @@ function Customer() {
 
   //Render
   useEffect(() => {
-    const getKH = async () => {
-      const kh = await callAPI("/customer");
-      // if (kh.error_code === 0) {
-      setlistKH(kh);
-      // } else {
-      //   alert(nv.error_msg);
-      //   setlistKH([]);
-      // }
-    };
+    if (localStorage.getItem("token") === null) {
+      navigate("/sign-in");
+    } else {
+      const getKH = async () => {
+        await callAPI2("/customer");
+        // setlistKH(kh);
+      };
 
-    getKH();
+      getKH();
+    }
   }, [load]);
 
   const callAPI = async (route) => {
@@ -132,6 +106,25 @@ function Customer() {
     } catch (err) {
       console.log(err);
       return [];
+    }
+  };
+
+  const callAPI2 = async (route) => {
+    try {
+      await api
+        .get(route)
+        .then((res) => {
+          if (res.data.error_code === 498) {
+            setlistKH([]);
+          } else {
+            setlistKH(res.data);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -164,362 +157,278 @@ function Customer() {
       setLoad(!load);
     }
   };
-
-  return (
-    <div className="dashB">
-      {formAdd ? (
-        <div>
-          <div
-            className="screenAdd"
-            onClick={() => {
-              resetForm();
-              setFormAdd(false);
-            }}
-          >
-            <form
-              className="formAdd"
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              onSubmit={handleModifyKH}
-            >
-              <div className="formLine1">
-                {updateId ? <h2>Sửa tài khoản</h2> : <h2>Thêm tài khoản</h2>}
-                <button
-                  className="btnX"
-                  onClick={() => {
-                    resetForm();
-                    setFormAdd(false);
+  {
+    if (localStorage.getItem("token") === null) {
+      navigate("/sign-in");
+    } else {
+      return (
+        <div className="dashB">
+          {formAdd ? (
+            <div>
+              <div
+                className="screenAdd"
+                onClick={() => {
+                  resetForm();
+                  setFormAdd(false);
+                }}
+              >
+                <form
+                  className="formAdd"
+                  onClick={(e) => {
+                    e.stopPropagation();
                   }}
+                  onSubmit={handleModifyKH}
                 >
-                  x
+                  <div className="formLine1">
+                    {updateId ? (
+                      <h2>Sửa tài khoản</h2>
+                    ) : (
+                      <h2>Thêm tài khoản</h2>
+                    )}
+                    <button
+                      className="btnX"
+                      onClick={() => {
+                        resetForm();
+                        setFormAdd(false);
+                      }}
+                    >
+                      x
+                    </button>
+                  </div>
+                  <label className="label">Tên khách hàng</label>
+                  <input
+                    value={accName}
+                    onChange={(e) => setAccName(e.target.value)}
+                    className="inp"
+                    placeholder="Tên khách hàng"
+                    type="text"
+                  ></input>
+                  <label className="label">Số điện thoại</label>
+                  <input
+                    className="inp"
+                    type="text"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="Số điện thoại"
+                  ></input>
+
+                  <div className="listBtnKH">
+                    <button
+                      className="btnFormKH cancel"
+                      onClick={() => {
+                        setFormAdd(false);
+                        resetForm();
+                      }}
+                    >
+                      Hủy
+                    </button>
+                    <button type="submit" className="btnFormKH btnSubmit">
+                      Xác nhận
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <div className="line1">
+                <h3>Danh sách khách hàng</h3>
+                <button className="btnAdd" onClick={() => setFormAdd(true)}>
+                  Tạo tài khoản
                 </button>
               </div>
-              <label className="label">Tên khách hàng</label>
-              <input
-                value={accName}
-                onChange={(e) => setAccName(e.target.value)}
-                className="inp"
-                placeholder="Tên khách hàng"
-                type="text"
-              ></input>
-              <label className="label">Số điện thoại</label>
-              <input
-                className="inp"
-                type="text"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Số điện thoại"
-              ></input>
+              <form className="lineFilter">
+                <input
+                  value={filterName}
+                  onChange={(e) => setfilterName(e.target.value)}
+                  type="text"
+                  className="filterName"
+                  name="name"
+                  placeholder="Tên"
+                ></input>
+                <input
+                  value={filterPhoneNumber}
+                  onChange={(e) => setfilterPhoneNumber(e.target.value)}
+                  type="text"
+                  className="filterPhoneNumber"
+                  name="phoneNumber"
+                  placeholder="Số điện thoại"
+                ></input>
 
-              <div className="listBtnKH">
+                <button type="submit" className="btnSearch">
+                  Tìm
+                </button>
+              </form>
+              <table>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Hành động</th>
+                </tr>
+                {currentItems.map((item, index) => {
+                  return (
+                    <tr>
+                      <td>{index + 1}</td>
+                      <td>{item.name}</td>
+                      <td>{item.phoneNumber}</td>
+                      <td>
+                        <div className="action">
+                          <button
+                            className="btnAction btnEdit"
+                            onClick={() => {
+                              setAccName(item.name);
+                              setPhoneNumber(item.phoneNumber);
+                              setUpdateId(item.khach_hang_id);
+                              setFormAdd(true);
+                            }}
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            className="btnAction btnDelete"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteKH(item.khach_hang_id);
+                            }}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </table>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={3}
+                pageCount={pageCount}
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                containerClassName="pagination"
+                pageLinkClassName="page-num"
+                previousClassName="page-num"
+                nextLinkClassName="page-num"
+                activeClassName="active"
+              />
+            </div>
+          ) : (
+            <div>
+              <div className="line1">
                 <button
-                  className="btnFormKH cancel"
+                  className="btnLogout"
                   onClick={() => {
-                    setFormAdd(false);
-                    resetForm();
+                    localStorage.clear();
+                    navigate("/sign-in");
                   }}
                 >
-                  Hủy
+                  Đăng xuất
                 </button>
-                <button type="submit" className="btnFormKH btnSubmit">
-                  Xác nhận
+                <h3>Danh sách khách hàng</h3>
+                <button className="btnAdd" onClick={() => setFormAdd(true)}>
+                  Tạo tài khoản
                 </button>
               </div>
-            </form>
-          </div>
-          <div className="line1">
-            <h3>Danh sách khách hàng</h3>
-            <button className="btnAdd" onClick={() => setFormAdd(true)}>
-              Tạo tài khoản
-            </button>
-          </div>
-          <form className="lineFilter">
-            <input
-              value={filterName}
-              onChange={(e) => setfilterName(e.target.value)}
-              type="text"
-              className="filterName"
-              name="name"
-              placeholder="Tên"
-            ></input>
-            <input
-              value={filterPhoneNumber}
-              onChange={(e) => setfilterPhoneNumber(e.target.value)}
-              type="text"
-              className="filterPhoneNumber"
-              name="phoneNumber"
-              placeholder="Số điện thoại"
-            ></input>
-
-            <button type="submit" className="btnSearch">
-              Tìm
-            </button>
-          </form>
-          <table>
-            <tr>
-              <th>STT</th>
-              <th>Tên khách hàng</th>
-              <th>Số điện thoại</th>
-              <th>Hành động</th>
-            </tr>
-            {currentItems.map((item, index) => {
-              return (
+              <form className="lineFilter">
+                <input
+                  value={filterName}
+                  onChange={(e) => setfilterName(e.target.value)}
+                  type="text"
+                  className="filterName"
+                  name="name"
+                  placeholder="Tên"
+                ></input>
+                <input
+                  value={filterPhoneNumber}
+                  onChange={(e) => setfilterPhoneNumber(e.target.value)}
+                  type="text"
+                  className="filterPhoneNumber"
+                  name="phoneNumber"
+                  placeholder="Số điện thoại"
+                ></input>
+                {listKH.length > 0 ? (
+                  <button
+                    type="submit"
+                    className="btnSearch"
+                    onClick={handleRefetch}
+                  >
+                    Tìm
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="btnSearch"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert("Bạn chưa đăng nhập!");
+                    }}
+                  >
+                    Tìm
+                  </button>
+                )}
+              </form>
+              <table>
                 <tr>
-                  <td>{index + 1}</td>
-                  <td>{item.name}</td>
-                  <td>{item.phoneNumber}</td>
-                  <td>
-                    <div className="action">
-                      <button
-                        className="btnAction btnEdit"
-                        onClick={() => {
-                          setAccName(item.name);
-                          setPhoneNumber(item.phoneNumber);
-                          setUpdateId(item.khach_hang_id);
-                          setFormAdd(true);
-                        }}
-                      >
-                        Sửa
-                      </button>
-                      <button
-                        className="btnAction btnDelete"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteKH(item.khach_hang_id);
-                        }}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
+                  <th>STT</th>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
+                  <th>Hành động</th>
                 </tr>
-              );
-            })}
-          </table>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            containerClassName="pagination"
-            pageLinkClassName="page-num"
-            previousClassName="page-num"
-            nextLinkClassName="page-num"
-            activeClassName="active"
-          />
+                {currentItems.map((item, index) => {
+                  return (
+                    <tr>
+                      <td>{index + 1}</td>
+                      <td>{item.name}</td>
+                      <td>{item.phoneNumber}</td>
+                      <td>
+                        <div className="action">
+                          <button
+                            className="btnAction btnEdit"
+                            onClick={() => {
+                              console.log(item.khach_hang_id);
+                              setAccName(item.name);
+                              setPhoneNumber(item.phoneNumber);
+                              setUpdateId(item.khach_hang_id);
+                              setFormAdd(true);
+                            }}
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            className="btnAction btnDelete"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              deleteKH(item.khach_hang_id);
+                            }}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </table>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next >"
+                onPageChange={handlePageClick}
+                pageRangeDisplayed={3}
+                pageCount={pageCount}
+                previousLabel="< previous"
+                renderOnZeroPageCount={null}
+                containerClassName="pagination"
+                pageLinkClassName="page-num"
+                previousClassName="page-num"
+                nextLinkClassName="page-num"
+                activeClassName="active"
+              />
+            </div>
+          )}
         </div>
-      ) : (
-        <div>
-          <div className="line1">
-            <h3>Danh sách khách hàng</h3>
-            <button className="btnAdd" onClick={() => setFormAdd(true)}>
-              Tạo tài khoản
-            </button>
-          </div>
-          <form className="lineFilter">
-            <input
-              value={filterName}
-              onChange={(e) => setfilterName(e.target.value)}
-              type="text"
-              className="filterName"
-              name="name"
-              placeholder="Tên"
-            ></input>
-            <input
-              value={filterPhoneNumber}
-              onChange={(e) => setfilterPhoneNumber(e.target.value)}
-              type="text"
-              className="filterPhoneNumber"
-              name="phoneNumber"
-              placeholder="Số điện thoại"
-            ></input>
-
-            <button type="submit" className="btnSearch" onClick={handleRefetch}>
-              Tìm
-            </button>
-          </form>
-          <table>
-            <tr>
-              <th>STT</th>
-              <th>Tên khách hàng</th>
-              <th>Số điện thoại</th>
-              <th>Hành động</th>
-            </tr>
-            {currentItems.map((item, index) => {
-              return (
-                <tr>
-                  <td>{index + 1}</td>
-                  <td>{item.name}</td>
-                  <td>{item.phoneNumber}</td>
-                  <td>
-                    <div className="action">
-                      <button
-                        className="btnAction btnEdit"
-                        onClick={() => {
-                          console.log(item.khach_hang_id);
-                          setAccName(item.name);
-                          setPhoneNumber(item.phoneNumber);
-                          setUpdateId(item.khach_hang_id);
-                          setFormAdd(true);
-                        }}
-                      >
-                        Sửa
-                      </button>
-                      <button
-                        className="btnAction btnDelete"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          deleteKH(item.khach_hang_id);
-                        }}
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </table>
-          <ReactPaginate
-            breakLabel="..."
-            nextLabel="next >"
-            onPageChange={handlePageClick}
-            pageRangeDisplayed={3}
-            pageCount={pageCount}
-            previousLabel="< previous"
-            renderOnZeroPageCount={null}
-            containerClassName="pagination"
-            pageLinkClassName="page-num"
-            previousClassName="page-num"
-            nextLinkClassName="page-num"
-            activeClassName="active"
-          />
-        </div>
-      )}
-    </div>
-  );
+      );
+    }
+  }
 }
 
 export default Customer;
-
-// <DashboardLayout>
-//   <DashboardNavbar />
-//   <ArgonBox py={3}>
-//     <Grid container spacing={3} mb={3}>
-//       <Grid item xs={12} md={6} lg={3}>
-//         <DetailedStatisticsCard
-//           title="today's money"
-//           count="$53,000"
-//           icon={{
-//             color: "info",
-//             component: <i className="ni ni-money-coins" />,
-//           }}
-//           percentage={{
-//             color: "success",
-//             count: "+55%",
-//             text: "since yesterday",
-//           }}
-//         />
-//       </Grid>
-//       <Grid item xs={12} md={6} lg={3}>
-//         <DetailedStatisticsCard
-//           title="today's users"
-//           count="2,300"
-//           icon={{
-//             color: "error",
-//             component: <i className="ni ni-world" />,
-//           }}
-//           percentage={{
-//             color: "success",
-//             count: "+3%",
-//             text: "since last week",
-//           }}
-//         />
-//       </Grid>
-//       <Grid item xs={12} md={6} lg={3}>
-//         <DetailedStatisticsCard
-//           title="new clients"
-//           count="+3,462"
-//           icon={{
-//             color: "success",
-//             component: <i className="ni ni-paper-diploma" />,
-//           }}
-//           percentage={{
-//             color: "error",
-//             count: "-2%",
-//             text: "since last quarter",
-//           }}
-//         />
-//       </Grid>
-//       <Grid item xs={12} md={6} lg={3}>
-//         <DetailedStatisticsCard
-//           title="sales"
-//           count="$103,430"
-//           icon={{
-//             color: "warning",
-//             component: <i className="ni ni-cart" />,
-//           }}
-//           percentage={{
-//             color: "success",
-//             count: "+5%",
-//             text: "than last month",
-//           }}
-//         />
-//       </Grid>
-//     </Grid>
-//     <Grid container spacing={3} mb={3}>
-//       <Grid item xs={12} lg={7}>
-//         <GradientLineChart
-//           title="Sales Overview"
-//           description={
-//             <ArgonBox display="flex" alignItems="center">
-//               <ArgonBox
-//                 fontSize={size.lg}
-//                 color="success"
-//                 mb={0.3}
-//                 mr={0.5}
-//                 lineHeight={0}
-//               >
-//                 <Icon sx={{ fontWeight: "bold" }}>arrow_upward</Icon>
-//               </ArgonBox>
-//               <ArgonTypography
-//                 variant="button"
-//                 color="text"
-//                 fontWeight="medium"
-//               >
-//                 4% more{" "}
-//                 <ArgonTypography
-//                   variant="button"
-//                   color="text"
-//                   fontWeight="regular"
-//                 >
-//                   in 2022
-//                 </ArgonTypography>
-//               </ArgonTypography>
-//             </ArgonBox>
-//           }
-//           chart={gradientLineChartData}
-//         />
-//       </Grid>
-//       <Grid item xs={12} lg={5}>
-//         <Slider />
-//       </Grid>
-//     </Grid>
-//     <Grid container spacing={3}>
-//       <Grid item xs={12} md={8}>
-//         <SalesTable title="Sales by Country" rows={salesTableData} />
-//       </Grid>
-//       <Grid item xs={12} md={4}>
-//         <CategoriesList
-//           title="categories"
-//           categories={categoriesListData}
-//         />
-//       </Grid>
-//     </Grid>
-//   </ArgonBox>
-//   <Footer />
-// </DashboardLayout>

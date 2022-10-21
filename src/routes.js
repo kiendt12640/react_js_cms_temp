@@ -8,8 +8,6 @@ import Tables from "layouts/tables";
 import Billing from "layouts/billing";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import SignUp from "layouts/authentication/sign-up";
-
 // Argon Dashboard 2 MUI components
 import ArgonBox from "components/ArgonBox";
 
@@ -98,6 +96,7 @@ const routes = [
     name: "Sign In",
     key: "sign-in",
     route: "/sign-in",
+
     icon: (
       <ArgonBox
         component="i"
@@ -107,21 +106,6 @@ const routes = [
       />
     ),
     component: <SignIn />,
-  },
-  {
-    type: "route",
-    name: "Sign Up",
-    key: "sign-up",
-    route: "/sign-up",
-    icon: (
-      <ArgonBox
-        component="i"
-        color="info"
-        fontSize="14px"
-        className="ni ni-collection"
-      />
-    ),
-    component: <SignUp />,
   },
 ];
 

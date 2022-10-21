@@ -1,38 +1,15 @@
-// react-router-dom components
-import { Link } from "react-router-dom";
-
-// @mui material components
-import Switch from "@mui/material/Switch";
-
-// Argon Dashboard 2 MUI components
 import ArgonBox from "components/ArgonBox";
 import CoverLayout from "layouts/authentication/components/CoverLayout";
-
-import ArgonTypography from "components/ArgonTypography";
-import ArgonInput from "components/ArgonInput";
-import ArgonButton from "components/ArgonButton";
-
-// Authentication layout components
-import IllustrationLayout from "layouts/authentication/components/IllustrationLayout";
-
 import "./index.css";
 import { useState, useEffect } from "react";
 import api from "./api";
 import { useNavigate } from "react-router-dom";
 
 function Illustration() {
-  // const [rememberMe, setRememberMe] = useState(false);
-
-  // const handleSetRememberMe = () => setRememberMe(!rememberMe);
-
   const navigate = useNavigate();
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassWord] = useState("");
-
-  const [listAcc, setlistAcc] = useState([]);
-
-  const [load, setLoad] = useState(true);
 
   const resetForm = () => {
     setPhoneNumber("");
@@ -41,40 +18,33 @@ function Illustration() {
 
   const handleModifyAccount = async (e) => {
     e.preventDefault();
+    let check = 0;
     const loginAcc = {
       phoneNumber: phoneNumber,
       password: password,
     };
-    let check = 0;
+    if (!phoneNumber) {
+      window.alert("Please enter a valid phone number");
+      check++;
+    }
 
-    if (check == 0) {
+    if (check === 0) {
       try {
-        await api.post("/sign-up", loginAcc);
-        setLoad(!load);
-        resetForm();
-        navigate("/dashboard");
+        await api
+          .post("/sign-in", loginAcc)
+          .then((res) => {
+            if (res.data.error_code === 401) {
+              alert(res.data.message);
+              return;
+            }
+            localStorage.setItem("token", res.data.token);
+            resetForm();
+            navigate("/dashboard");
+          })
+          .catch((err) => window.alert(err.message));
       } catch (err) {
         console.log(err);
       }
-    }
-  };
-
-  useEffect(() => {
-    const getListAccount = async () => {
-      const nv = await callAPI("/sign-in");
-      setlistAcc(nv);
-    };
-
-    getListAccount();
-  }, [load]);
-
-  const callAPI = async (route) => {
-    try {
-      const res = await api.get(route);
-      return res.data;
-    } catch (err) {
-      console.log(err);
-      return [];
     }
   };
 
