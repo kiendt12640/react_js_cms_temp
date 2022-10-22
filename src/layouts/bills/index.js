@@ -29,9 +29,6 @@ function Bill() {
   //State filter
   const [filtertrangThaiDon, setfiltertrangThaiDon] = useState("");
   const [filterKhachHang, setfilterKhachHang] = useState("");
-  const [filterngayThanhToan, setfilterngayThanhToan] = useState("");
-  const [filterngayNhanHang, setfilterngayNhanHang] = useState("");
-  const [filterngayTraHang, setfilterngayTraHang] = useState("");
 
   const [load, setLoad] = useState(true);
 
@@ -130,34 +127,29 @@ function Bill() {
 
   //Render
   useEffect(() => {
-    if (localStorage.getItem("token") === null) {
-      navigate("/sign-in");
-    } else {
-      const getTrangThaiDon = async () => {
-        const trangthai = await callAPI("/trangthaidon");
-        setListTrangThai(trangthai);
-      };
+    const getTrangThaiDon = async () => {
+      const trangthai = await callAPI("/status_bill");
+      setListTrangThai(trangthai);
+    };
 
-      const getkhachhang = async () => {
-        const kh = await callAPI("/customer");
-        setlistKhachHang(kh);
-      };
+    const getkhachhang = async () => {
+      const kh = await callAPI("/customer");
+      setlistKhachHang(kh);
+    };
 
-      const getBill = async () => {
-        await callAPI2("/bill");
-        // setlistBill(bill);
-      };
+    const getBill = async () => {
+      await callAPI2("/bill");
+    };
 
-      const getDichVu = async () => {
-        const dichVu = await callAPI("/service");
-        setListDichVu(dichVu);
-      };
+    const getDichVu = async () => {
+      const dichVu = await callAPI("/service");
+      setListDichVu(dichVu);
+    };
 
-      getDichVu();
-      getTrangThaiDon();
-      getkhachhang();
-      getBill();
-    }
+    getDichVu();
+    getTrangThaiDon();
+    getkhachhang();
+    getBill();
   }, [load]);
 
   const callAPI = async (route) => {
@@ -176,12 +168,9 @@ function Bill() {
         .get(route)
         .then((res) => {
           if (res.data.error_code === 498) {
-            setListTrangThai([]);
-            setlistKhachHang([]);
-            setListDichVu([]);
             setlistBill([]);
           } else {
-            setlistBill(res.data);
+            setlistBill(res.data.data);
           }
         })
         .catch((err) => {

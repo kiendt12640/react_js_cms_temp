@@ -60,7 +60,7 @@ function Default() {
     // Update
     if (updateId) {
       try {
-        await api.put(`/dashboard/${updateId}`, data);
+        await api.put(`/employee/${updateId}`, data);
         resetForm();
         setLoad(!load);
       } catch (err) {
@@ -79,7 +79,7 @@ function Default() {
       });
       if (check == 0) {
         try {
-          const response = await api.post("/dashboard", data);
+          const response = await api.post("/employee", data);
           console.log(response.data);
           setLoad(!load);
           resetForm();
@@ -93,12 +93,12 @@ function Default() {
   //Render
   useEffect(() => {
     const getTrangThai = async () => {
-      const trangthai = await callAPI("/trangthai");
+      const trangthai = await callAPI("/status");
       setListTrangThai(trangthai);
     };
 
     const getNV = async () => {
-      await callAPI2("/dashboard");
+      await callAPI2("/employee");
       // setlistNV(nv);
     };
 
@@ -139,7 +139,7 @@ function Default() {
   const handleRefetch = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.get("/dashboard", {
+      const res = await api.get("/employee", {
         params: {
           name: filterName,
           phoneNumber: filterPhoneNumber,
@@ -156,7 +156,7 @@ function Default() {
   const deleteNV = async (id) => {
     if (window.confirm("Xóa nhân viên ?") === true) {
       try {
-        await api.delete(`/dashboard/${id}`);
+        await api.delete(`/employee/${id}`);
         setLoad(!load);
       } catch (err) {
         console.log(err);

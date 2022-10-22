@@ -5,7 +5,6 @@ import ReactPaginate from "react-paginate";
 import { useNavigate } from "react-router-dom";
 
 function Customer() {
-  // const { size } = typography;
   const navigate = useNavigate();
 
   const [accName, setAccName] = useState("");
@@ -87,16 +86,12 @@ function Customer() {
 
   //Render
   useEffect(() => {
-    if (localStorage.getItem("token") === null) {
-      navigate("/sign-in");
-    } else {
-      const getKH = async () => {
-        await callAPI2("/customer");
-        // setlistKH(kh);
-      };
+    const getKH = async () => {
+      await callAPI2("/customer");
+      // setlistKH(kh);
+    };
 
-      getKH();
-    }
+    getKH();
   }, [load]);
 
   const callAPI = async (route) => {

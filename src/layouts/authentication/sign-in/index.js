@@ -31,7 +31,7 @@ function Illustration() {
     if (check === 0) {
       try {
         await api
-          .post("/sign-in", loginAcc)
+          .post("/employee/sign-in", loginAcc)
           .then((res) => {
             if (res.data.error_code === 401) {
               alert(res.data.message);

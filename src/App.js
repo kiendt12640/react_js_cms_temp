@@ -193,10 +193,10 @@ export default function App() {
       {layout === "vr" && <Configurator />}
       <Routes>
         {getRoutes(routes)}
-        {localStorage.getItem("token") !== null ? (
-          <Route path="/" element={<Navigate to="/dashboard" />} />
+        {localStorage.getItem("token") === null ? (
+          <Route path="/" element={<Navigate to="/sign-in" />} />
         ) : (
-          <Route path="*" element={<Navigate to="/sign-in" />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         )}
       </Routes>
     </ThemeProvider>
