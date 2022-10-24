@@ -87,8 +87,8 @@ function Customer() {
   //Render
   useEffect(() => {
     const getKH = async () => {
-      await callAPI2("/customer");
-      // setlistKH(kh);
+      const kh = await callAPI("/customer");
+      setlistKH(kh);
     };
 
     getKH();
@@ -97,7 +97,7 @@ function Customer() {
   const callAPI = async (route) => {
     try {
       const res = await api.get(route);
-      return res.data;
+      return res.data.data;
     } catch (err) {
       console.log(err);
       return [];
@@ -109,11 +109,7 @@ function Customer() {
       await api
         .get(route)
         .then((res) => {
-          if (res.data.error_code === 498) {
-            setlistKH([]);
-          } else {
-            setlistKH(res.data.data);
-          }
+          return res.data.data;
         })
         .catch((err) => {
           console.log(err);

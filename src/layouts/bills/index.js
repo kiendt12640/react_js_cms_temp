@@ -135,10 +135,11 @@ function Bill() {
     const getkhachhang = async () => {
       const kh = await callAPI("/customer");
       setlistKhachHang(kh);
+      console.log(listKhachHang);
     };
 
     const getBill = async () => {
-      await callAPI2("/bill");
+      await callAPI2("/bill/list");
     };
 
     const getDichVu = async () => {
@@ -161,7 +162,6 @@ function Bill() {
       return [];
     }
   };
-
   const callAPI2 = async (route) => {
     try {
       await api
@@ -185,7 +185,7 @@ function Bill() {
   const handleRefetch = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.get("/bill", {
+      const res = await api.get("/bill/list", {
         params: {
           trangthaidonID: filtertrangThaiDon,
           khachhangID: filterKhachHang,
@@ -199,12 +199,9 @@ function Bill() {
 
   // Delete
   const deleteBill = async (id) => {
-    const checkDelete = {
-      checkDelete: 1,
-    };
     if (window.confirm("Xóa hóa đơn ?") === true) {
       try {
-        await api.put(`/bill/delete_bill/${id}`, checkDelete);
+        await api.put(`/bill/delete_bill/${id}`);
         setLoad(!load);
         resetForm();
       } catch (err) {
