@@ -112,7 +112,7 @@ function Customer() {
           if (res.data.error_code === 498) {
             setlistKH([]);
           } else {
-            setlistKH(res.data);
+            setlistKH(res.data.data);
           }
         })
         .catch((err) => {
@@ -133,7 +133,7 @@ function Customer() {
           phoneNumber: filterPhoneNumber,
         },
       });
-      setlistKH(res.data);
+      setlistKH(res.data.data);
     } catch (err) {
       console.log(err);
     }

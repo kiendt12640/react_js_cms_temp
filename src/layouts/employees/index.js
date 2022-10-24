@@ -109,7 +109,7 @@ function Default() {
   const callAPI = async (route) => {
     try {
       const res = await api.get(route);
-      return res.data;
+      return res.data.data;
     } catch (err) {
       console.log(err);
       return [];
@@ -124,7 +124,7 @@ function Default() {
           if (res.data.error_code === 498) {
             setlistNV([]);
           } else {
-            setlistNV(res.data);
+            setlistNV(res.data.data);
           }
         })
         .catch((err) => {
@@ -146,7 +146,7 @@ function Default() {
           trangthaiID: filterTrangThai,
         },
       });
-      setlistNV(res.data);
+      setlistNV(res.data.data);
     } catch (err) {
       console.log(err);
     }

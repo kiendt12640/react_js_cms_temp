@@ -196,7 +196,7 @@ export default function App() {
         {localStorage.getItem("token") === null ? (
           <Route path="/" element={<Navigate to="/sign-in" />} />
         ) : (
-          <Route path="*" element={<Navigate to="/dashboard" />} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
         )}
       </Routes>
     </ThemeProvider>

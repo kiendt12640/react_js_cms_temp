@@ -58,7 +58,7 @@ function Service() {
           if (res.data.error_code === 498) {
             setlistService([]);
           } else {
-            setlistService(res.data);
+            setlistService(res.data.data);
           }
         })
         .catch((err) => {
@@ -79,7 +79,7 @@ function Service() {
           giadichvu: filterServicePrice,
         },
       });
-      setlistService(res.data);
+      setlistService(res.data.data);
     } catch (err) {
       console.log(err);
     }

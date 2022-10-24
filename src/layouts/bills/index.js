@@ -155,7 +155,7 @@ function Bill() {
   const callAPI = async (route) => {
     try {
       const res = await api.get(route);
-      return res.data;
+      return res.data.data;
     } catch (err) {
       console.log(err);
       return [];
@@ -191,7 +191,7 @@ function Bill() {
           khachhangID: filterKhachHang,
         },
       });
-      setlistBill(res.data);
+      setlistBill(res.data.data);
     } catch (err) {
       console.log(err);
     }
