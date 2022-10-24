@@ -204,7 +204,7 @@ function Bill() {
     };
     if (window.confirm("Xóa hóa đơn ?") === true) {
       try {
-        await api.put(`/bill/${id}`, checkDelete);
+        await api.put(`/bill/delete_bill/${id}`, checkDelete);
         setLoad(!load);
         resetForm();
       } catch (err) {
@@ -679,6 +679,7 @@ function Bill() {
                                 setlistBillDetail(item.hdct);
                                 setUpdateId(item.hoa_don_id);
                                 setFormAdd(true);
+                                console.log(item.hoa_don_id);
                               }}
                             >
                               Chi tiết
