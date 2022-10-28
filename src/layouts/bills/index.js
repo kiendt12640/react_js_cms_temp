@@ -84,8 +84,8 @@ function Bill() {
   const handleModifyBill = async (e) => {
     e.preventDefault();
     const dataAdd = {
-      trangthaidonID: listTrangThai[0].id,
-      khachhangID: khachHang,
+      trangthaidonId: listTrangThai[0].id,
+      khachhangId: khachHang,
       ngaythanhtoan: ngayThanhToan,
       ngaynhanhang: ngayNhanHang,
       ngaytrahang: ngayTraHang,
@@ -93,8 +93,8 @@ function Bill() {
     };
 
     const dataUpdate = {
-      trangthaidonID: trangThaiDon,
-      khachhangID: khachHang,
+      trangthaidonId: trangThaiDon,
+      khachhangId: khachHang,
       ngaythanhtoan: ngayThanhToan,
       ngaynhanhang: ngayNhanHang,
       ngaytrahang: ngayTraHang,
@@ -135,7 +135,6 @@ function Bill() {
     const getkhachhang = async () => {
       const kh = await callAPI("/customer");
       setlistKhachHang(kh);
-      console.log(listKhachHang);
     };
 
     const getBill = async () => {
@@ -187,8 +186,8 @@ function Bill() {
     try {
       const res = await api.get("/bill/list", {
         params: {
-          trangthaidonID: filtertrangThaiDon,
-          khachhangID: filterKhachHang,
+          trangthaidonId: filtertrangThaiDon,
+          khachhangId: filterKhachHang,
         },
       });
       setlistBill(res.data.data);
@@ -219,7 +218,10 @@ function Bill() {
     setlistBillDetail(newListBillDetail);
   };
   {
-    if (localStorage.getItem("token") === null) {
+    if (
+      localStorage.getItem("token") === null ||
+      localStorage.getItem("token") === undefined
+    ) {
       navigate("/sign-in");
     } else {
       return (
@@ -367,7 +369,7 @@ function Bill() {
                               e.preventDefault();
                               setlistBillDetail([
                                 ...listBillDetail,
-                                { dichvuID: dichVu, soluong: soluong },
+                                { dichvuId: dichVu, soluong: soluong },
                               ]);
                               setSoLuong("");
                               setDichVu("");
@@ -390,19 +392,19 @@ function Bill() {
                             <tr>
                               <td>
                                 {listDichVu?.find(
-                                  ({ id }) => id == item.dichvuID
+                                  ({ id }) => id == item.dichvuId
                                 ) &&
                                   listDichVu?.find(
-                                    ({ id }) => id == item.dichvuID
+                                    ({ id }) => id == item.dichvuId
                                   ).tendichvu}
                               </td>
                               <td>{item.soluong}</td>
                               <td>
                                 {listDichVu?.find(
-                                  ({ id }) => id == item.dichvuID
+                                  ({ id }) => id == item.dichvuId
                                 ) &&
                                   listDichVu?.find(
-                                    ({ id }) => id == item.dichvuID
+                                    ({ id }) => id == item.dichvuId
                                   ).giadichvu * item.soluong}
                               </td>
                               {updateId ? (
@@ -508,9 +510,9 @@ function Bill() {
                   return (
                     <tr>
                       <td>{index + 1}</td>
-                      <td>{item.trangthai}</td>
-                      <td>{item.khach_hang_name}</td>
-                      <td>{item.tongtien}</td>
+                      <td>{item.trang_thai_don.trangthai}</td>
+                      <td>{item.khach_hang.name}</td>
+                      <td>{item.tong_tien}</td>
                       <td>
                         {item.ngaythanhtoan &&
                           moment(item.ngaythanhtoan).format("L")}
@@ -528,13 +530,13 @@ function Bill() {
                           <button
                             className="btnAction btnEdit"
                             onClick={() => {
-                              settrangThaiDon(item.trangthaidonID);
-                              setkhachHang(item.khachhangID);
+                              settrangThaiDon(item.trang_thai_don.id);
+                              setkhachHang(item.khach_hang.id);
                               setngayThanhToan(item.ngaythanhtoan);
                               setngayNhanHang(item.ngaynhanhang);
                               setngayTraHang(item.ngaytrahang);
-                              setUpdateId(item.hoa_don_id);
-                              setlistBillDetail(item.hdct);
+                              setUpdateId(item.id);
+                              setlistBillDetail(item.hoa_don_chi_tiet);
                               setFormAdd(true);
                             }}
                           >
@@ -544,7 +546,7 @@ function Bill() {
                             className="btnAction btnDelete"
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteBill(item.hoa_don_id);
+                              deleteBill(item.id);
                             }}
                           >
                             Xóa
@@ -647,9 +649,9 @@ function Bill() {
                     return (
                       <tr>
                         <td>{index + 1}</td>
-                        <td>{item.trangthai}</td>
-                        <td>{item.khach_hang_name}</td>
-                        <td>{item.tongtien}</td>
+                        <td>{item.trang_thai_don.trangthai}</td>
+                        <td>{item.khach_hang.name}</td>
+                        <td>{item.tong_tien}</td>
                         <td>
                           {item.ngaythanhtoan &&
                             moment(item.ngaythanhtoan).format("L")}
@@ -668,15 +670,14 @@ function Bill() {
                             <button
                               className="btnAction btnEdit"
                               onClick={() => {
-                                settrangThaiDon(item.trangthaidonID);
-                                setkhachHang(item.khachhangID);
+                                settrangThaiDon(item.trang_thai_don.id);
+                                setkhachHang(item.khach_hang.id);
                                 setngayThanhToan(item.ngaythanhtoan);
                                 setngayNhanHang(item.ngaynhanhang);
                                 setngayTraHang(item.ngaytrahang);
-                                setlistBillDetail(item.hdct);
-                                setUpdateId(item.hoa_don_id);
+                                setlistBillDetail(item.hoa_don_chi_tiet);
+                                setUpdateId(item.id);
                                 setFormAdd(true);
-                                console.log(item.hoa_don_id);
                               }}
                             >
                               Chi tiết
@@ -685,7 +686,7 @@ function Bill() {
                               className="btnAction btnDelete"
                               onClick={(e) => {
                                 e.preventDefault();
-                                deleteBill(item.hoa_don_id);
+                                deleteBill(item.id);
                               }}
                             >
                               Xóa

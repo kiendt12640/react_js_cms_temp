@@ -33,13 +33,15 @@ function Illustration() {
         await api
           .post("/employee/sign-in", loginAcc)
           .then((res) => {
-            if (res.data.error_code === 401) {
+            if (res.data.error_code === 404) {
               alert(res.data.message);
               return;
             }
             localStorage.setItem("token", res.data.token);
             resetForm();
-            navigate("/dashboard");
+            if (res.data.token) {
+              navigate("/dashboard");
+            }
           })
           .catch((err) => window.alert(err.message));
       } catch (err) {

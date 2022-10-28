@@ -89,6 +89,7 @@ function Customer() {
     const getKH = async () => {
       const kh = await callAPI("/customer");
       setlistKH(kh);
+      console.log(kh);
     };
 
     getKH();
@@ -149,7 +150,10 @@ function Customer() {
     }
   };
   {
-    if (localStorage.getItem("token") === null) {
+    if (
+      localStorage.getItem("token") === null ||
+      localStorage.getItem("token") === undefined
+    ) {
       navigate("/sign-in");
     } else {
       return (
@@ -267,7 +271,7 @@ function Customer() {
                             onClick={() => {
                               setAccName(item.name);
                               setPhoneNumber(item.phoneNumber);
-                              setUpdateId(item.khach_hang_id);
+                              setUpdateId(item.id);
                               setFormAdd(true);
                             }}
                           >
@@ -277,7 +281,7 @@ function Customer() {
                             className="btnAction btnDelete"
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteKH(item.khach_hang_id);
+                              deleteKH(item.id);
                             }}
                           >
                             Xóa
@@ -323,7 +327,10 @@ function Customer() {
               <form className="lineFilter">
                 <input
                   value={filterName}
-                  onChange={(e) => setfilterName(e.target.value)}
+                  onChange={(e) => {
+                    setfilterPhoneNumber("");
+                    setfilterName(e.target.value);
+                  }}
                   type="text"
                   className="filterName"
                   name="name"
@@ -331,7 +338,10 @@ function Customer() {
                 ></input>
                 <input
                   value={filterPhoneNumber}
-                  onChange={(e) => setfilterPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    setfilterName("");
+                    setfilterPhoneNumber(e.target.value);
+                  }}
                   type="text"
                   className="filterPhoneNumber"
                   name="phoneNumber"
@@ -379,7 +389,7 @@ function Customer() {
                               console.log(item.khach_hang_id);
                               setAccName(item.name);
                               setPhoneNumber(item.phoneNumber);
-                              setUpdateId(item.khach_hang_id);
+                              setUpdateId(item.id);
                               setFormAdd(true);
                             }}
                           >
@@ -389,7 +399,7 @@ function Customer() {
                             className="btnAction btnDelete"
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteKH(item.khach_hang_id);
+                              deleteKH(item.id);
                             }}
                           >
                             Xóa

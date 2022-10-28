@@ -35,7 +35,10 @@ function DashBoard() {
   const navigate = useNavigate();
 
   {
-    if (localStorage.getItem("token") === null) {
+    if (
+      localStorage.getItem("token") === null ||
+      localStorage.getItem("token") === undefined
+    ) {
       navigate("/sign-in");
     } else {
       return <div />;

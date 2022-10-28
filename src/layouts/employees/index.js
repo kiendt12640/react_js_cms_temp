@@ -55,7 +55,7 @@ function Default() {
     const data = {
       name: accName,
       phoneNumber: phoneNumber,
-      trangthaiID: trangthai,
+      trangthaiId: trangthai,
     };
     // Update
     if (updateId) {
@@ -143,7 +143,7 @@ function Default() {
         params: {
           name: filterName,
           phoneNumber: filterPhoneNumber,
-          trangthaiID: filterTrangThai,
+          trangthaiId: filterTrangThai,
         },
       });
       setlistNV(res.data.data);
@@ -166,7 +166,10 @@ function Default() {
     }
   };
   {
-    if (localStorage.getItem("token") === null) {
+    if (
+      localStorage.getItem("token") === null ||
+      localStorage.getItem("token") === undefined
+    ) {
       navigate("/sign-in");
     } else {
       return (
@@ -299,18 +302,17 @@ function Default() {
                       <td>{item.name}</td>
                       <td>{item.phoneNumber}</td>
                       <td>
-                        <a className="activeAcc">{item.trangthai}</a>
+                        <a className="activeAcc">{item.trangthai.trangthai}</a>
                       </td>
                       <td>
                         <div className="action">
                           <button
                             className="btnAction btnEdit"
                             onClick={() => {
-                              console.log(item.nv_id);
                               setAccName(item.name);
                               setPhoneNumber(item.phoneNumber);
-                              setTrangThai(item.trangthaiID);
-                              setUpdateId(item.nv_id);
+                              setTrangThai(item.trangthai.id);
+                              setUpdateId(item.id);
                               setFormAdd(true);
                             }}
                           >
@@ -320,7 +322,7 @@ function Default() {
                             className="btnAction btnDelete"
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteNV(item.nv_id);
+                              deleteNV(item.id);
                             }}
                           >
                             Xóa
@@ -367,7 +369,11 @@ function Default() {
               <form className="lineFilter">
                 <input
                   value={filterName}
-                  onChange={(e) => setfilterName(e.target.value)}
+                  onChange={(e) => {
+                    setfilterPhoneNumber("");
+                    setfilterTrangThai("");
+                    setfilterName(e.target.value);
+                  }}
                   type="text"
                   className="filterName"
                   name="name"
@@ -375,7 +381,11 @@ function Default() {
                 ></input>
                 <input
                   value={filterPhoneNumber}
-                  onChange={(e) => setfilterPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    setfilterName("");
+                    setfilterTrangThai("");
+                    setfilterPhoneNumber(e.target.value);
+                  }}
                   type="text"
                   className="filterPhoneNumber"
                   name="phoneNumber"
@@ -383,7 +393,11 @@ function Default() {
                 ></input>
                 <select
                   value={filterTrangThai}
-                  onChange={(e) => setfilterTrangThai(e.target.value)}
+                  onChange={(e) => {
+                    setfilterPhoneNumber("");
+                    setfilterName("");
+                    setfilterTrangThai(e.target.value);
+                  }}
                   className="select"
                 >
                   <option></option>
@@ -427,18 +441,17 @@ function Default() {
                       <td>{item.name}</td>
                       <td>{item.phoneNumber}</td>
                       <td>
-                        <a className="activeAcc">{item.trangthai}</a>
+                        <a className="activeAcc">{item.trangthai.trangthai}</a>
                       </td>
                       <td>
                         <div className="action">
                           <button
                             className="btnAction btnEdit"
                             onClick={() => {
-                              console.log(item.nv_id);
                               setAccName(item.name);
                               setPhoneNumber(item.phoneNumber);
-                              setTrangThai(item.trangthaiID);
-                              setUpdateId(item.nv_id);
+                              setTrangThai(item.trangthai.id);
+                              setUpdateId(item.id);
                               setFormAdd(true);
                             }}
                           >
@@ -448,7 +461,7 @@ function Default() {
                             className="btnAction btnDelete"
                             onClick={(e) => {
                               e.preventDefault();
-                              deleteNV(item.nv_id);
+                              deleteNV(item.id);
                             }}
                           >
                             Xóa
