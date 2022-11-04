@@ -36,7 +36,8 @@ function Illustration() {
             if (res.data.error_code === 404) {
               alert(res.data.message);
               return;
-            }
+              
+            } 
             localStorage.setItem("token", res.data.token);
             resetForm();
             if (res.data.token) {
